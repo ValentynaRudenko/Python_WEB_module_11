@@ -3,35 +3,63 @@ from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from src.database.models import Contact
+from src.database.models import Contact, User
 from src.schemas import ContactBase, ContactUpdate
 
 from datetime import datetime, timedelta
 
 
-async def get_contacts(skip: int, limit: int, db: Session) -> List[Contact]:
-    return db.query(Contact).offset(skip).limit(limit).all()
+async def get_contacts(
+        skip: int,
+        limit: int,
+        user: User,
+        db: Session) -> List[Contact]:
+    return db.query(Contact).filter(
+        Contact.user_id == user.id
+        ).offset(skip).limit(limit).all()
 
 
-async def get_contact_id(contact_id: int, db: Session) -> Contact:
-    return db.query(Contact).filter(Contact.id == contact_id).first()
+async def get_contact_id(
+        contact_id: int,
+        user: User,
+        db: Session) -> Contact:
+    return db.query(Contact).filter(
+        Contact.id == contact_id,
+        Contact.user_id == user.id
+        ).first()
 
-
-async def get_contact_name(contact_name: str, db: Session) -> List[Contact]:
-    return db.query(Contact).filter(Contact.first_name == contact_name).all()
+async def get_contact_name(
+        contact_name: str,
+        user: User,
+        db: Session) -> List[Contact]:
+    return db.query(Contact).filter(
+        Contact.first_name == contact_name,
+        Contact.user_id == user.id
+        ).all()
 
 
 async def get_contact_last_name(
-        contact_last_name: str, db: Session) -> List[Contact]:
+        contact_last_name: str,
+        user: User,
+        db: Session) -> List[Contact]:
     return db.query(Contact).filter(
-        Contact.last_name == contact_last_name).all()
+        Contact.last_name == contact_last_name,
+        Contact.user_id == user.id
+        ).all()
 
 
-async def get_contact_email(contact_email: str, db: Session) -> Contact:
-    return db.query(Contact).filter(Contact.email == contact_email).first()
+async def get_contact_email(contact_email: str,
+                            user: User,
+                            db: Session) -> Contact:
+    return db.query(Contact).filter(
+        Contact.email == contact_email,
+        Contact.user_id == user.id
+        ).first()
 
 
-async def create_contact(body: ContactBase, db: Session) -> Contact:
+async def create_contact(body: ContactBase,
+                         user: User,
+                         db: Session) -> Contact:
     contact = Contact(
         first_name=body.first_name,
         last_name=body.last_name,
@@ -39,7 +67,8 @@ async def create_contact(body: ContactBase, db: Session) -> Contact:
         phone=body.phone,
         birth_date=body.birth_date,
         additional_data=body.additional_data,
-        created_at=body.created_at
+        created_at=body.created_at,
+        user=user
         )
     db.add(contact)
     db.commit()
@@ -48,8 +77,13 @@ async def create_contact(body: ContactBase, db: Session) -> Contact:
     return contact
 
 
-async def remove_contact(contact_id: int, db: Session) -> Contact | None:
-    contact = db.query(Contact).filter(Contact.id == contact_id).first()
+async def remove_contact(contact_id: int,
+                         user: User,
+                         db: Session) -> Contact | None:
+    contact = db.query(Contact).filter(
+        Contact.id == contact_id,
+        Contact.user_id == user.id
+    ).first()
     if contact:
         db.delete(contact)
         db.commit()
@@ -57,8 +91,14 @@ async def remove_contact(contact_id: int, db: Session) -> Contact | None:
 
 
 async def update_contact(
-        contact_id: int, body: ContactUpdate, db: Session) -> Contact | None:
-    contact = db.query(Contact).filter(Contact.id == contact_id).first()
+        contact_id: int,
+        body: ContactUpdate,
+        user: User,
+        db: Session) -> Contact | None:
+    contact = db.query(Contact).filter(
+        Contact.id == contact_id,
+        Contact.user_id == user.id
+        ).first()
     if contact:
         contact.first_name = body.first_name,
         contact.last_name = body.last_name,
