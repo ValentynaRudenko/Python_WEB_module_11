@@ -2,6 +2,8 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
+# from fastapi_limiter import RateLimiter
+from fastapi_limiter.depends import RateLimiter
 
 from src.database.db import get_db
 from src.schemas import ContactBase, ContactResponse, ContactUpdate
@@ -16,13 +18,16 @@ from src.database.models import Contact, User
 router = APIRouter(prefix='/contacts')
 
 
-@router.get("/", response_model=List[ContactResponse])
+@router.get("/",
+            response_model=List[ContactResponse],
+            description='No more than 10 requests per minute',
+            dependencies=[Depends(RateLimiter(times=10, seconds=60))])
 async def read_contacts(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user)
-        ):
+     ):
     contacts = await get_contacts(skip, limit, current_user, db)
     return contacts
 
@@ -129,3 +134,4 @@ async def read_upcoming_birthdays(
         ):
     contacts = await get_upcoming_birthdays(db)
     return contacts
+

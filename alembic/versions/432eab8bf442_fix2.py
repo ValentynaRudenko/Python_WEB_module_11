@@ -18,14 +18,21 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-def upgrade():
-    # Add user_id column with a default value
-    op.add_column('contacts', sa.Column('user_id', sa.Integer(), nullable=True, server_default='1'))
+# def upgrade():
+#     # Add user_id column with a default value
+#     op.add_column('contacts', sa.Column('user_id', sa.Integer(), nullable=True, server_default='1'))
 
-    # Update the column to set NOT NULL after setting the default
-    op.alter_column('contacts', 'user_id', existing_type=sa.Integer(), nullable=False, server_default=None)
+#     # Update the column to set NOT NULL after setting the default
+#     op.alter_column('contacts', 'user_id', existing_type=sa.Integer(), nullable=False, server_default=None)
 
 
-def downgrade():
-    # Drop user_id column
-    op.drop_column('contacts', 'user_id')
+# def downgrade():
+#     # Drop user_id column
+#     op.drop_column('contacts', 'user_id')
+
+def upgrade() -> None:
+    pass
+
+
+def downgrade() -> None:
+    pass

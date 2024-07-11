@@ -18,11 +18,18 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-def upgrade():
-    # Allow NULL values for user_id column temporarily
-    op.alter_column('contacts', 'user_id', existing_type=sa.Integer(), nullable=True)
+# def upgrade():
+#     # Allow NULL values for user_id column temporarily
+#     op.alter_column('contacts', 'user_id', existing_type=sa.Integer(), nullable=True)
 
 
-def downgrade():
-    # Revert back to NOT NULL constraint if downgrading
-    op.alter_column('contacts', 'user_id', existing_type=sa.Integer(), nullable=False)
+# def downgrade():
+#     # Revert back to NOT NULL constraint if downgrading
+#     op.alter_column('contacts', 'user_id', existing_type=sa.Integer(), nullable=False)
+
+def upgrade() -> None:
+    pass
+
+
+def downgrade() -> None:
+    pass

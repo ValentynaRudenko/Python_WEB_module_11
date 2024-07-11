@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import (
     Mapped, mapped_column, DeclarativeBase, relationship
 )
@@ -39,3 +39,4 @@ class User(Base):
     avatar: Mapped[str] = mapped_column(String(255), nullable=True)
     contact: Mapped[List["Contact"]] = relationship(
         "Contact", back_populates="user")
+    confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
