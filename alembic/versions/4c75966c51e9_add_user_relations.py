@@ -18,22 +18,29 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+# def upgrade() -> None:
+#     op.add_column('contacts',
+#                   sa.Column(
+#                     'user_id',
+#                     sa.INTEGER,
+#                     sa.ForeignKey("users.id",
+#                                   ondelete='CASCADE')
+#                     ))
+#     op.add_column('users',
+#                   sa.Column(
+#                       'avatar',
+#                       sa.String(length=255),
+#                       nullable=True
+#                       ))
+
+
+# def downgrade() -> None:
+#     op.drop_column('contacts', 'user_id')
+#     op.drop_column('users', 'avatar')
+
 def upgrade() -> None:
-    op.add_column('contacts',
-                  sa.Column(
-                    'user_id',
-                    sa.INTEGER,
-                    sa.ForeignKey("users.id",
-                                  ondelete='CASCADE')
-                    ))
-    op.add_column('users',
-                  sa.Column(
-                      'avatar',
-                      sa.String(length=255),
-                      nullable=True
-                      ))
+    pass
 
 
 def downgrade() -> None:
-    op.drop_column('contacts', 'user_id')
-    op.drop_column('users', 'avatar')
+    pass
