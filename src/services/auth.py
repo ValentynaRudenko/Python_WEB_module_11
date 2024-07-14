@@ -26,9 +26,27 @@ class Auth:
     r = redis.Redis(host=settings.redis_host, port=settings.redis_port, db=0)
 
     def verify_password(self, plain_password, hashed_password):
+        """
+        Method of the Auth class. Verify password.
+
+        :param plain_password: The plain_password.
+        :type plain_password: str
+        :param hashed_password: The hashed_password.
+        :type hashed_password: str
+        :return: plain_password, hashed_password.
+        :rtype: Note | None
+        """
         return self.pwd_context.verify(plain_password, hashed_password)
 
     def get_password_hash(self, password: str):
+        """
+         Method of the Auth class. Get hashed password.
+
+        :param password: The plain_password.
+        :type password: str
+        :return: hashed_password.
+        :rtype: Note | None
+        """
         return self.pwd_context.hash(password)
 
     # define a function to generate a new access token
@@ -37,6 +55,16 @@ class Auth:
             data: dict,
             expires_delta: Optional[float] = None
             ):
+        """
+         Method of the Auth class. Create access token.
+
+        :param data: Data.
+        :type data: dict
+        :param expires_delta: Expired time.
+        :type expires_delta: float
+        :return: encoded_access_token.
+        :rtype: Note | None
+        """
         to_encode = data.copy()
         if expires_delta:
             expire = (
@@ -62,6 +90,16 @@ class Auth:
             data: dict,
             expires_delta: Optional[float] = None
             ):
+        """
+         Method of the Auth class. Create refresh token.
+
+        :param data: Data.
+        :type data: dict
+        :param expires_delta: Expired time.
+        :type expires_delta: float
+        :return: encoded_refresh_token.
+        :rtype: Note | None
+        """
         to_encode = data.copy()
         if expires_delta:
             expire = (
@@ -82,6 +120,14 @@ class Auth:
         return encoded_refresh_token
 
     async def decode_refresh_token(self, refresh_token: str):
+        """
+         Method of the Auth class. Decode refresh token.
+
+        :param refresh_token: Refresh token.
+        :type refresh_token: str
+        :return: email.
+        :rtype: Note | None
+        """
         try:
             payload = jwt.decode(
                 refresh_token,
@@ -101,43 +147,21 @@ class Auth:
                 detail='Could not validate credentials'
                 )
 
-    # async def get_current_user(
-    #         self,
-    #         token: str = Depends(oauth2_scheme),
-    #         db: Session = Depends(get_db)
-    #         ):
-    #     credentials_exception = HTTPException(
-    #         status_code=status.HTTP_401_UNAUTHORIZED,
-    #         detail="Could not validate credentials",
-    #         headers={"WWW-Authenticate": "Bearer"},
-    #     )
-
-    #     try:
-    #         # Decode JWT
-    #         payload = jwt.decode(
-    #             token,
-    #             self.SECRET_KEY,
-    #             algorithms=[self.ALGORITHM]
-    #             )
-    #         if payload['scope'] == 'access_token':
-    #             email = payload["sub"]
-    #             if email is None:
-    #                 raise credentials_exception
-    #         else:
-    #             raise credentials_exception
-    #     except JWTError as e:
-    #         raise credentials_exception
-
-    #     user = await repository_users.get_user_by_email(email, db)
-    #     if user is None:
-    #         raise credentials_exception
-    #     return user
-
     async def get_current_user(
             self,
             token: str = Depends(oauth2_scheme),
             db: Session = Depends(get_db)
             ):
+        """
+         Method of the Auth class. Get current user.
+
+        :param token: token.
+        :type token: str
+        :param db: The database session.
+        :type db: Session
+        :return: user.
+        :rtype: Note | None
+        """
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -171,6 +195,14 @@ class Auth:
         return user
 
     def create_email_token(self, data: dict):
+        """
+         Method of the Auth class. Create email token.
+
+        :param data: data.
+        :type data: dict
+        :return: token.
+        :rtype: Note | None
+        """
         to_encode = data.copy()
         expire = datetime.now(timezone.utc) + timedelta(days=7)
         to_encode.update({"iat": datetime.now(timezone.utc), "exp": expire})
@@ -181,6 +213,14 @@ class Auth:
         return token
 
     async def get_email_from_token(self, token: str):
+        """
+        Method of the Auth class. Get email from token.
+
+        :param token: token.
+        :type token: str
+        :return: email.
+        :rtype: Note | None
+        """
         try:
             payload = jwt.decode(
                 token,

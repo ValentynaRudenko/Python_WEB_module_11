@@ -18,6 +18,14 @@ router = APIRouter(prefix="/users", tags=["users"])
 async def read_users_me(
     current_user: User = Depends(auth_service.get_current_user)
         ):
+    """
+    Retrieves a current.
+
+    :param current_user: The current user.
+    :type current_user: User
+    :return: The user with the specified email, or None if it does not exist.
+    :rtype: Note | None
+    """
     return current_user
 
 
@@ -28,6 +36,18 @@ async def update_avatar_user(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db)
         ):
+    """
+    To update the user's avatar.
+
+    :param file: The file with the new avatar.
+    :type file: UploadFile.
+    :param current_user: Current user.
+    :type current_user: User
+    :param db: The database session.
+    :type db: Session
+    :return: The newly created token.
+    :rtype: Note
+    """
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
