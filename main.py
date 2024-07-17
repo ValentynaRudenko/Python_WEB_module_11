@@ -18,7 +18,6 @@ models.Base.metadata.create_all(bind=engine)
 
 
 async def app_lifespan(app: FastAPI):
-    # async def startup():
     print("Starting up...")
     r = await redis.Redis(
         host=settings.redis_host,

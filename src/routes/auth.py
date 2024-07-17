@@ -1,4 +1,4 @@
-from typing import List
+# from typing import List
 
 from fastapi import APIRouter, HTTPException, Depends, status, Security
 from fastapi import BackgroundTasks, Request
@@ -26,6 +26,20 @@ async def signup(body: UserModel,
                  request: Request,
                  db: Session = Depends(get_db)
                  ):
+    """
+    User signup.
+
+    :param body: The data for user creation.
+    :type body: UserModel
+    :param background_tasks: Backgroun tasks
+    :type background_tasks: BackgroundTasks
+    :param request: Request the user's signup.
+    :type request: Request.
+    :param db: The database session.
+    :type db: Session
+    :return: The new user.
+    :rtype: Note | None
+    """
     exist_user = await repository_users.get_user_by_email(body.email, db)
     if exist_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
@@ -44,11 +58,20 @@ async def signup(body: UserModel,
             }
 
 
-
 @router.post("/login", response_model=TokenModel)
 async def login(body: OAuth2PasswordRequestForm = Depends(),
                 db: Session = Depends(get_db)
                 ):
+    """
+    User login.
+
+    :param body: Password request form.
+    :type body: OAuth2PasswordRequestForm.
+    :param db: The database session.
+    :type db: Session
+    :return: Acess token, refresh token, "token_type": "bearer"
+    :rtype: Note | None
+    """
     user = await repository_users.get_user_by_email(body.username, db)
     if user is None:
         raise HTTPException(
@@ -88,6 +111,16 @@ async def refresh_token(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db)
         ):
+    """
+    Get refresh token.
+
+    :param credentials: Credentials.
+    :type credentials: HTTPAuthorizationCredentials.
+    :param db: The database session.
+    :type db: Session
+    :return: Acess token, refresh token, "token_type": "bearer"
+    :rtype: Note | None
+    """
     token = credentials.credentials
     email = await auth_service.decode_refresh_token(token)
     user = await repository_users.get_user_by_email(email, db)
@@ -98,8 +131,12 @@ async def refresh_token(
             detail="Invalid refresh token"
             )
 
-    access_token = await auth_service.create_access_token(data={"sub": email})
-    refresh_token = await auth_service.create_refresh_token(data={"sub": email})
+    access_token = await auth_service.create_access_token(
+        data={"sub": email}
+        )
+    refresh_token = await auth_service.create_refresh_token(
+        data={"sub": email}
+        )
     await repository_users.update_token(user, refresh_token, db)
     return {"access_token": access_token,
             "refresh_token": refresh_token,
@@ -112,6 +149,16 @@ async def confirmed_email(
     token: str,
     db: Session = Depends(get_db)
         ):
+    """
+    Confirm the user's email.
+
+    :param token: Token.
+    :type token: str.
+    :param db: The database session.
+    :type db: Session
+    :return: "message": "Email confirmed".
+    :rtype: Note | None
+    """
     email = await auth_service.get_email_from_token(token)
     user = await repository_users.get_user_by_email(email, db)
     if user is None:
@@ -132,6 +179,20 @@ async def request_email(
     request: Request,
     db: Session = Depends(get_db)
         ):
+    """
+    Request email for confirmation.
+
+    :param body: Request email.
+    :type body: RequestEmail.
+    :param background_tasks: BackgroundTasks.
+    :type background_tasks: BackgroundTasks.
+    :param request: Request for email confirmation.
+    :type request: Request.
+    :param db: The database session.
+    :type db: Session
+    :return: "message": "Check your email for confirmation.".
+    :rtype: Note | None
+    """
     user = await repository_users.get_user_by_email(body.email, db)
 
     if user.confirmed:
